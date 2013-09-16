@@ -12,12 +12,13 @@ Outline
 context manager or decorators.
 2. Tell your program to output the report when it's done.
 3. Run your program.
+4. ?????
 5. Profit.
 
 Basic Usage
 -----------
 
-1. How to designate code that should be monitored.
+How to designate code that should be monitored.
 
 A free-standing piece of code.
 
@@ -28,7 +29,6 @@ with timed('my measurement'):
     # do stuff here...
 
 # to assign the measurement to a specific group
-
 with timed('my measurement', 'general frobnication'):
     # do stuff here
 ```
@@ -54,7 +54,7 @@ class Foo(object):
         pass
 ```
 
-2. How to see the report.
+How to see the report.
 
 ```python
 from aeon import default_timer
@@ -67,7 +67,8 @@ Further features
 ----------------
 
 The `timed`, `ftimed` and `mtimed` helpers all take an optional `timer`
-parameter in case you want to use your own timer or several timer objects.
+parameter in case you want to use your own timer or several timer objects
+in parallel.
 
 ```python
 from aeon import timed, ftimed, mtimed, Timer
@@ -78,7 +79,6 @@ with timed('my_measurement', timer=my_custom_timer):
     pass
 
 # or
-
 with timed('my_measurement', 'my_group', my_custom_timer):
     pass
 
