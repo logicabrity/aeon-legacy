@@ -45,3 +45,9 @@ def test_measurement_measures_something():
     m.stop()
     elapsed_again = m.total_runtime
     assert elapsed_again > elapsed
+
+@pytest.mark.regression
+def test_measurement_has_name_and_group():
+    m = Measurement("name", "group")
+    assert m.name == "name"
+    assert m.group == "group"

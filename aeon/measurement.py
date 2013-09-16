@@ -20,7 +20,7 @@ class Measurement(object):
 
     """
     def __init__(self, name, group):
-        self.name = group
+        self.name = name
         self.group = group
         self.calls = 0
         self.total_runtime = 0.0
