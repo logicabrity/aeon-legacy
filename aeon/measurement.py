@@ -45,3 +45,6 @@ class Measurement(object):
                     self.name, self.group))
         self.__running = False
         self.total_runtime += time.time() - self.__start
+
+    def time_per_call(self):
+        return self.total_runtime / self.calls
