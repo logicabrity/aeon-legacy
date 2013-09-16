@@ -1,0 +1,2 @@
+class AeonError(Exception):
+    pass
