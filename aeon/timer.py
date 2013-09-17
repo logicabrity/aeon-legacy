@@ -43,7 +43,7 @@ class Timer(Series):
 
         """
         measurement = self.get(name, group)
-        return measurement.total_runtime / measurement.calls
+        return measurement.time_per_call
 
     def report(self, max_items=10):
         """
