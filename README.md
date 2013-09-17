@@ -106,7 +106,7 @@ for i in xrange(100):
     # stuff happens here
     m.stop()
 
-assert m.calls = 100
+assert m.calls == 100
 print m.total_runtime, m.time_per_call
 ```
 
