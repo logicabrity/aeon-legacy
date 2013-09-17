@@ -1,3 +1,5 @@
+from time import time
+from operator import attrgetter
 from collections import defaultdict
 from series import Series
 
@@ -19,7 +21,7 @@ class Timer(Series):
         Returns the time that has ellapsed since the timer was created in seconds.
 
         """
-        return time.time() - self._created
+        return time() - self._created
 
     def calls(self, name, group=Series.default_group):
         """
@@ -61,11 +63,11 @@ class Timer(Series):
         msg += separator
         msg_row = "| {:18} | {:28} | {:>6} | {:>10.3g} | {:>12.3g} |\n"
         shown = 0
-        for t in sorted(
+        for m in sorted(
                 self._measurements.values(),
-                key=operator.attrgetter('total_runtime'),
+                key=attrgetter('total_runtime'),
                 reverse=True):
-            msg += msg_row.format(t.group, t.name, t.calls, t.total_runtime, t.tot_runtime / t.calls)
+            msg += msg_row.format(m.group, m.name, m.calls, m.total_runtime, m.time_per_call())
             shown += 1
             if shown >= max_items:
                 break
@@ -80,7 +82,7 @@ class Timer(Series):
             msg += "| {:18} | {:>8.3g} | {:>4.2g} |\n".format(group, tot_t, share)
         msg += separator + "\n"
 
-        seconds = time.time() - self._created
+        seconds = time() - self._created
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         msg += "Total wall time %d:%02d:%02d." % (h, m, s)
@@ -99,8 +101,8 @@ class Timer(Series):
         for m in self._measurements.values():
             grouped_timings[m.group] += m.total_runtime
 
-        recorded_time = self.total_time()
-        wall_time = time.time() - self._created
+        recorded_time = self.total_runtime()
+        wall_time = self.total_walltime()
         grouped_timings = [(group, tot_t, 100 * tot_t / wall_time) for group, tot_t in grouped_timings.iteritems()]
 
         diff = abs(recorded_time - wall_time)
