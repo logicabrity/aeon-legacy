@@ -43,6 +43,27 @@ def test_can_stop_last_started_measurement():
         s.stop("one")  # this will have been stopped by stop_last
 
 
+def test_start_next():
+    s = Series()
+    s.start("one")
+    s.start_next("two")
+
+    with pytest.raises(MeasurementStateError):
+        s.stop("one")  # this will have been stopped by start_next
+
+
+def test_start_next_only_if_other_measurement_running():
+    s = Series()
+    with pytest.raises(NoMeasurementRunningError):
+        s.start_next("two")
+
+
+def test_cant_stop_last_if_not_started():
+    s = Series()
+    with pytest.raises(NoMeasurementRunningError):
+        s.stop_last()
+
+
 def test_more_than_one_measurement_can_run_at_the_same_time():
     # this might be a bug and not a feature
     s = Series()
