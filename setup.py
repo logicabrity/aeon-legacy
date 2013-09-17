@@ -8,5 +8,7 @@ setup(
     version='1.0',
     packages=['aeon', ],
     license='The MIT License (MIT)',
-    long_description=open('README').read(),
+    description=('Runtime and number of calls for designated functions, '
+                 'methods, or pieces of code. Optionally output nice report.')
+    long_description=open('README.txt').read(),
 )

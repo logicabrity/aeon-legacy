@@ -10,7 +10,7 @@ Outline
 
 1. Mark parts of the code that should be monitored with the provided
 context manager or decorators.
-2. Tell your program to output the report when it's done.
+2. Tell your program to output the report or provide you the data when it's done.
 3. Run your program.
 4. ?????
 5. Profit.
