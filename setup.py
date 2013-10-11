@@ -12,4 +12,5 @@ setup(
     description=('Runtime and number of calls for designated functions, '
                  'methods, or pieces of code. Optionally output nice report.'),
     long_description=open('README.txt').read(),
+    data_files = [("", ["LICENSE", "AUTHORS"])],
 )
