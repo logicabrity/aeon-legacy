@@ -7,6 +7,7 @@ setup(
     author_email='mail@marc-antonio.de',
     version='1.0.2',
     packages=['aeon', ],
+    keywords=['profiling', 'timings', 'benchmark'],
     license='The MIT License (MIT)',
     description=('Runtime and number of calls for designated functions, '
                  'methods, or pieces of code. Optionally output nice report.'),
