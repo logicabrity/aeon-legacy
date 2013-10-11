@@ -5,7 +5,7 @@ setup(
     url='https://github.com/sMAshdot/aeon',
     author='Marc-Antonio Bisotti',
     author_email='mail@marc-antonio.de',
-    version='1.0.2',
+    version='1.0.3',
     packages=['aeon', ],
     keywords=['profiling', 'timings', 'benchmark'],
     license='The MIT License (MIT)',
