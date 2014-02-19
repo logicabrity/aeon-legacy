@@ -30,9 +30,12 @@ class Measurement(object):
     def start(self):
         if self.__running:
             raise MeasurementStateError(
-                "Measurement '{}[{}]' is already running. "
-                "Needs to be stopped first".format(
-                self.name, self.group))
+                "Measurement '{name}[{group}]' is already running. Needs to be "
+                "stopped first. In interactive use, try 'from aeon "
+                "import default_timer; default_timer.reset()' to reset "
+                "the default timer (or reset whichever customized timer "
+                "you are using).".format(
+                    name=self.name, group=self.group))
         self.__running = True
         self.calls += 1
         self.__start = time.time()
@@ -40,9 +43,9 @@ class Measurement(object):
     def stop(self):
         if not self.__running:
             raise MeasurementStateError(
-                "Measurement '{}[{}]' is not running. "
+                "Measurement '{name}[{group}]' is not running. "
                 "Needs to be started first.".format(
-                    self.name, self.group))
+                    name=self.name, group=self.group))
         self.__running = False
         self.total_runtime += time.time() - self.__start
 
