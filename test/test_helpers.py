@@ -1,6 +1,6 @@
 from aeon.helpers import default_timer, ftimed, mtimed, timed
 from aeon.timer import Timer
-
+import pytest
 
 def test_decorated_function():
     timer = Timer()
@@ -102,3 +102,15 @@ def test_context_default_timer():
         with timed('context_default'):
             pass
     assert default_timer.calls('context_default') == 3
+
+
+def test_context_is_exception_safe():
+    class ExampleError(Exception):
+        pass
+
+    with pytest.raises(ExampleError):
+        with timed("exception_test"):
+            raise ExampleError("Example")
+
+    with timed("exception_test"):
+        print "We can do this because the last measurement was stopped gracefully."

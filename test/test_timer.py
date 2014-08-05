@@ -19,7 +19,7 @@ def test_total_walltime_measures_time_passing():
     t = Timer()
     elapsed = t.total_walltime()
     elapsed_again = t.total_walltime()
-    assert elapsed_again > elapsed
+    assert elapsed_again >= elapsed
 
 
 @pytest.mark.fixed
