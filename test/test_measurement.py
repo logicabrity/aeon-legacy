@@ -1,18 +1,19 @@
 import time
 import pytest
-from aeon.measurement import Measurement, MeasurementStateError
+from aeon.measurement import Measurement
+from aeon.errors import InvalidMeasurementState
 
 
 def test_cant_start_measurement_twice():
     m = Measurement("name", "group")
     m.start()
-    with pytest.raises(MeasurementStateError):
+    with pytest.raises(InvalidMeasurementState):
         m.start()
 
 
 def test_cant_stop_measurement_before_starting_it():
     m = Measurement("name", "group")
-    with pytest.raises(MeasurementStateError):
+    with pytest.raises(InvalidMeasurementState):
         m.stop()
 
 
@@ -20,7 +21,7 @@ def test_cant_stop_measurement_twice():
     m = Measurement("name", "group")
     m.start()
     m.stop()
-    with pytest.raises(MeasurementStateError):
+    with pytest.raises(InvalidMeasurementState):
         m.stop()
 
 

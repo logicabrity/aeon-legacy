@@ -1,8 +1,6 @@
 import pytest
-from aeon.measurement_store import (
-    MeasurementStore, UnknownMeasurementError, NoMeasurementRunningError
-)
-from aeon.measurement import MeasurementStateError
+import aeon.errors as err
+from aeon.measurement_store import MeasurementStore
 
 
 def test_start_measurement():
@@ -18,7 +16,7 @@ def test_stop_measurement():
 
 def test_cant_stop_nonexistent_measurement():
     s = MeasurementStore()
-    with pytest.raises(UnknownMeasurementError):
+    with pytest.raises(err.UnknownMeasurement):
         s.stop("one", "test_series")
 
 
@@ -39,7 +37,7 @@ def test_can_stop_last_started_measurement():
     s.start("one")
     s.stop_last()
 
-    with pytest.raises(MeasurementStateError):
+    with pytest.raises(err.InvalidMeasurementState):
         s.stop("one")  # this will have been stopped by stop_last
 
 
@@ -48,19 +46,19 @@ def test_start_next():
     s.start("one")
     s.start_next("two")
 
-    with pytest.raises(MeasurementStateError):
+    with pytest.raises(err.InvalidMeasurementState):
         s.stop("one")  # this will have been stopped by start_next
 
 
 def test_start_next_only_if_other_measurement_running():
     s = MeasurementStore()
-    with pytest.raises(NoMeasurementRunningError):
+    with pytest.raises(err.NoMeasurementRunning):
         s.start_next("two")
 
 
 def test_cant_stop_last_if_not_started():
     s = MeasurementStore()
-    with pytest.raises(NoMeasurementRunningError):
+    with pytest.raises(err.NoMeasurementRunning):
         s.stop_last()
 
 

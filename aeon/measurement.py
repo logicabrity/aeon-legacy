@@ -1,17 +1,5 @@
 import time
-from util import AeonError
-
-
-class MeasurementStateError(AeonError):
-    """
-    A measurement is supposed to be running and isn't (or vice versa).
-
-    Most often, this means that a measurement for a particular piece of code is
-    already running and can't be started a second time. In that case, the
-    measurement needs to be stopped before restarting it.
-
-    """
-    pass
+from errors import InvalidMeasurementState
 
 
 class Measurement(object):
@@ -29,7 +17,7 @@ class Measurement(object):
 
     def start(self):
         if self.__running:
-            raise MeasurementStateError(
+            raise InvalidMeasurementState(
                 "Measurement '{name}[{group}]' is already running. Needs to be "
                 "stopped first. In interactive use, try 'from aeon "
                 "import default_timer; default_timer.reset()' to reset "
@@ -42,7 +30,7 @@ class Measurement(object):
 
     def stop(self):
         if not self.__running:
-            raise MeasurementStateError(
+            raise InvalidMeasurementState(
                 "Measurement '{name}[{group}]' is not running. "
                 "Needs to be started first.".format(
                     name=self.name, group=self.group))

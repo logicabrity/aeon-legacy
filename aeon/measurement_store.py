@@ -1,16 +1,6 @@
 from time import time
-from util import AeonError
+from errors import UnknownMeasurement, NoMeasurementRunning
 from measurement import Measurement
-
-
-class UnknownMeasurementError(AeonError):
-    """ The measurement in question can't be found in the records. """
-    pass
-
-
-class NoMeasurementRunningError(AeonError):
-    """ There is no measurement running. """
-    pass
 
 
 class MeasurementStore(object):
@@ -58,7 +48,7 @@ class MeasurementStore(object):
         except KeyError:
             print "Known measurements (in format group::name):\n\t{}.".format(
                 self._measurements.keys())
-            raise UnknownMeasurementError("Can't find measurement '{}' of "
+            raise UnknownMeasurement("Can't find measurement '{}' of "
                                           "group '{}'.".format(name, group))
 
     def _put(self, measurement):
@@ -105,7 +95,7 @@ class MeasurementStore(object):
 
         """
         if self._last is None:
-            raise NoMeasurementRunningError("There is no measurement to stop.")
+            raise NoMeasurementRunning("There is no measurement to stop.")
         self._last.stop()
 
     def start_next(self, name, group=default_group):
@@ -114,6 +104,6 @@ class MeasurementStore(object):
 
         """
         if self._last is None:
-            raise NoMeasurementRunningError("There is no measurement to stop.")
+            raise NoMeasurementRunning("There is no measurement to stop.")
         self.stop_last()
         self.start(name, group)
