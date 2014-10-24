@@ -1,4 +1,5 @@
 import pytest
+import time
 from aeon.timer import Timer
 
 EPSILON = 1e-16
@@ -18,6 +19,7 @@ def test_total_runtime_sums_individual_runtimes():
 def test_total_walltime_measures_time_passing():
     t = Timer()
     elapsed = t.total_walltime()
+    time.sleep(1e-3)
     elapsed_again = t.total_walltime()
     assert elapsed_again > elapsed
 
