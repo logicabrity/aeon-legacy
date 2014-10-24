@@ -6,9 +6,7 @@ from timer import Timer
 
 default_timer = Timer()  # Series would also work here
 
-
-@contextmanager
-def timed(name, group=default_timer.default_group, timer=default_timer):
+class timed(object):
     """
     Context manager to time a piece of code.
 
@@ -34,9 +32,16 @@ def timed(name, group=default_timer.default_group, timer=default_timer):
             sleep(1)
 
     """
-    timer.start(name, group)
-    yield
-    timer.stop(name, group)
+    def __init__(self, name, group=default_timer.default_group, timer=default_timer):
+        self.timer = timer
+        self.name = name
+        self.group = group
+
+    def __enter__(self):
+        self.timer.start(self.name, self.group)
+
+    def __exit__(self, type, value, traceback):
+        self.timer.stop(self.name, self.group)
 
 
 def mtimed(method_or_timer=default_timer):
@@ -69,9 +74,8 @@ def mtimed(method_or_timer=default_timer):
         @wraps(method)
         def decorated_method(self, *args, **kwargs):
             group = self.__class__.__name__
-            timer.start(name, group)
-            ret = method(self, *args, **kwargs)
-            timer.stop(name, group)
+            with timed(name, group, timer):
+                ret = method(self, *args, **kwargs)
             return ret
 
         return decorated_method
@@ -101,9 +105,8 @@ def ftimed(fn_or_timer=default_timer):
 
         @wraps(fn)
         def decorated_function(*args, **kwargs):
-            timer.start(name, module)
-            ret = fn(*args, **kwargs)
-            timer.stop(name, module)
+            with timed(name, module, timer):
+                ret = fn(*args, **kwargs)
             return ret
 
         return decorated_function
