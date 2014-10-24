@@ -2,7 +2,7 @@ from time import time
 from operator import attrgetter
 from collections import defaultdict
 from measurement_store import MeasurementStore
-from functools import wraps
+from functools import update_wrapper
 from sys import modules
 from os import path
 
@@ -14,9 +14,23 @@ class Timer(object):
         self.measurements = MeasurementStore()
         self._context = None
 
-    def __call__(self, name, group=default_group):
-        self._context = (name, group)
-        return self
+    def __call__(self, func_or_name, group=default_group):
+        if callable(func_or_name):
+            func = func_or_name
+            name = func.__name__
+            filename = modules[func.__module__].__file__
+            module = path.splitext(path.basename(filename))[0]
+
+            def decorated_func(*args, **kwargs):
+                with self(name, module):
+                    ret = func(*args, **kwargs)
+                return ret
+            update_wrapper(decorated_func, func)
+            return decorated_func
+        else:
+            name = func_or_name
+            self._context = (name, group)
+            return self
 
     def __enter__(self):
         if self._context is None:
@@ -29,37 +43,7 @@ class Timer(object):
         self.measurements.stop(*self._context)
         self._context = None
 
-    def ftimed(self, function):
-        """
-        Decorator for functions that are to be included in the report.
-
-        Basic usage:
-
-            from time import sleep
-            from aeon import timer
-
-            @timer.ftimed
-            def foo():
-                sleep(1)
-
-            print timer
-
-        """
-        def decorator(function):
-            name = function.__name__
-            filename = modules[function.__module__].__file__
-            module = path.splitext(path.basename(filename))[0]
-
-            @wraps(function)
-            def decorated_function(*args, **kwargs):
-                with self(name, module):
-                    ret = function(*args, **kwargs)
-                return ret
-
-            return decorated_function
-        return decorator(function)
-
-    def mtimed(self, method):
+    def method(self, met):
         """
         Decorator for methods that are to be included in the report.
 
@@ -69,25 +53,23 @@ class Timer(object):
             from aeon import timer
 
             class Foo(object):
-                @timer.mtimed
+                @timer.method
                 def bar(self):
                     sleep(1)
 
             print timer
 
         """
-        def decorator(method):
-            name = method.__name__
+        name = met.__name__
 
-            @wraps(method)
-            def decorated_method(theirself, *args, **kwargs):
-                group = theirself.__class__.__name__
-                with self(name, group):
-                    ret = method(theirself, *args, **kwargs)
-                return ret
+        def decorated_method(theirself, *args, **kwargs):
+            group = theirself.__class__.__name__
+            with self(name, group):
+                ret = met(theirself, *args, **kwargs)
+            return ret
 
-            return decorated_method
-        return decorator(method)
+        update_wrapper(decorated_method, met)
+        return decorated_method
 
     def start(self, name, group=default_group):
         """

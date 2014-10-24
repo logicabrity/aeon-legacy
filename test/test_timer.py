@@ -40,38 +40,62 @@ def test_context_is_exception_safe():
 def test_decorated_function():
     timer = Timer()
 
-    @timer.ftimed
+    @timer
     def my_func():
         pass
 
     my_func()
     assert timer.calls('my_func', 'test_timer') == 1
 
+    @timer
+    def my_func_two(a):
+        pass
+
+    my_func_two(1)
+    assert timer.calls('my_func_two', 'test_timer') == 1
+
+
+def test_decorated_function_keeps_docstring():
+    timer = Timer()
+
+    @timer
+    def my_func():
+        """ my docstring """
+
+    my_func()
+
+    assert my_func.__doc__ == " my docstring "
+
 
 def test_decorated_method():
     timer = Timer()
 
     class Foo(object):
-        @timer.mtimed
+        @timer.method
         def bar(self):
             pass
 
+        @timer.method
+        def baz(self, a):
+            pass
+
     foo = Foo()
-    for i in xrange(3):
-        foo.bar()
-    assert timer.calls('bar', 'Foo') == 3
+    foo.bar()
+    foo.baz(1)
+    assert timer.calls('bar', 'Foo') == 1
+    assert timer.calls('baz', 'Foo') == 1
 
 
 def test_return_values_of_functions_and_methods_should_not_be_affected():
     timer = Timer()
 
-    @timer.ftimed
+    @timer
     def returns_one():
         return 1
     assert returns_one() == 1
 
     class MyClass(object):
-        @timer.mtimed
+        @timer.method
         def returns_two(self):
             return 2
     mo = MyClass()
