@@ -2,51 +2,163 @@ from time import time
 from operator import attrgetter
 from collections import defaultdict
 from measurement_store import MeasurementStore
+from functools import wraps
+from sys import modules
+from os import path
 
 
-class Timer(MeasurementStore):
-    """
-    Extends Series to support queries and print nice measurement results.
+class Timer(object):
+    default_group = "default"
 
-    """
+    def __init__(self):
+        self.measurements = MeasurementStore()
+        self._context = None
+
+    def __call__(self, name, group=default_group):
+        self._context = (name, group)
+        return self
+
+    def __enter__(self):
+        if self._context is None:
+            raise ArgumentError("Please use aeon's contextmanager with",
+                                "the measurement name (and optionally group) as ",
+                                "argument.")
+        self.measurements.start(*self._context)
+
+    def __exit__(self, type, value, traceback):
+        self.measurements.stop(*self._context)
+        self._context = None
+
+    def ftimed(self, function):
+        """
+        Decorator for functions that are to be included in the report.
+
+        Basic usage:
+
+            from time import sleep
+            from aeon import timer
+
+            @timer.ftimed
+            def foo():
+                sleep(1)
+
+            print timer
+
+        """
+        def decorator(function):
+            name = function.__name__
+            filename = modules[function.__module__].__file__
+            module = path.splitext(path.basename(filename))[0]
+
+            @wraps(function)
+            def decorated_function(*args, **kwargs):
+                with self(name, module):
+                    ret = function(*args, **kwargs)
+                return ret
+
+            return decorated_function
+        return decorator(function)
+
+    def mtimed(self, method):
+        """
+        Decorator for methods that are to be included in the report.
+
+        Basic usage:
+
+            from time import sleep
+            from aeon import timer
+
+            class Foo(object):
+                @timer.mtimed
+                def bar(self):
+                    sleep(1)
+
+            print timer
+
+        """
+        def decorator(method):
+            name = method.__name__
+
+            @wraps(method)
+            def decorated_method(theirself, *args, **kwargs):
+                group = theirself.__class__.__name__
+                with self(name, group):
+                    ret = method(theirself, *args, **kwargs)
+                return ret
+
+            return decorated_method
+        return decorator(method)
+
+    def start(self, name, group=default_group):
+        """
+        Start measurement with `name` and `group`.
+        Measurement is automatically created if it doesn't exist already.
+
+        """
+        self.measurements.start(name, group)
+
+    def stop(self, name, group=default_group):
+        """
+        Stop measurement with `name` and `group`.
+
+        """
+        self.measurements.stop(name, group)
+
+    def stop_last(self):
+        """
+        Stop the measurement that was started last.
+
+        Helps avoiding repetitive typing of `name` and `group` when dealing
+        with a sequence of measurements.
+
+        """
+        self.measurements.stop_last()
+
+    def start_next(self, name, group=default_group):
+        """
+        Stop the last measurement to start a new one with `name` and `group`.
+
+        Helps avoiding repetitive typing of `name` and `group` when dealing
+        with a sequence of measurements.
+
+        """
+        self.measurements.start_next()
+
     def total_runtime(self):
         """
         Returns the sum of the runtime of all measurements.
 
         """
-        return sum([m.total_runtime for m in self._measurements.itervalues()])
+        return sum([m.total_runtime for m in self.measurements.all()])
 
     def total_walltime(self):
         """
         Returns the time that has ellapsed since the timer was created in seconds.
 
         """
-        return time() - self._created
+        return time() - self.measurements.created
 
-    def calls(self, name, group=MeasurementStore.default_group):
+    def calls(self, name, group=default_group):
         """
         Returns the number of calls to the object of `group` with `name`.
 
         """
-        measurement = self.get(name, group)
-        return measurement.calls
+        return self.measurements.get(name, group).calls
 
-    def time(self, name, group=MeasurementStore.default_group):
+    def time(self, name, group=default_group):
         """
         Returns the total runtime of the measurement of `group` with `name`.
 
         """
-        measurement = self.get(name, group)
-        return measurement.total_runtime
+        return self.measurements.get(name, group).total_runtime
 
-    def time_per_call(self, name, group=MeasurementStore.default_group):
+    def time_per_call(self, name, group=default_group):
         """
         Returns the average runtime for one execution of the measurement
         of `group` with `name`.
 
         """
-        measurement = self.get(name, group)
-        return measurement.time_per_call()
+        return self.measurements.get(name, group).time_per_call()
 
     def report(self, max_items=10):
         """
@@ -64,7 +176,7 @@ class Timer(MeasurementStore):
         msg_row = "| {:18} | {:28} | {:>6} | {:>10.3g} | {:>12.3g} |\n"
         shown = 0
         for m in sorted(
-                self._measurements.values(),
+                self.measurements.all(),
                 key=attrgetter('total_runtime'),
                 reverse=True):
             msg += msg_row.format(m.group, m.name, m.calls, m.total_runtime, m.time_per_call())
@@ -78,18 +190,18 @@ class Timer(MeasurementStore):
         msg += separator
         msg += "| {:18} | {:>8} | {:>4} |\n".format('class/module', 'time (s)', '%')
         msg += separator
-        for group, tot_t, share in self.grouped_timings():
-            msg += "| {:18} | {:>8.3g} | {:>4.2g} |\n".format(group, tot_t, share)
+        for group, tot_t, share in self.grouped_measurements():
+            msg += "| {:18} | {:>8.3g} | {:>4.3g} |\n".format(group, tot_t, share)
         msg += separator + "\n"
 
-        seconds = time() - self._created
+        seconds = self.total_walltime()
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         msg += "Total wall time %d:%02d:%02d." % (h, m, s)
 
         return msg
 
-    def grouped_timings(self):
+    def grouped_measurements(self):
         """
         Returns a list of tuples (group, runtime, share), sorted by decreasing runtime.
 
@@ -98,7 +210,7 @@ class Timer(MeasurementStore):
 
         """
         grouped_timings = defaultdict(float)
-        for m in self._measurements.values():
+        for m in self.measurements.all():
             grouped_timings[m.group] += m.total_runtime
 
         recorded_time = self.total_runtime()

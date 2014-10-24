@@ -1,6 +1,6 @@
 from time import time
-from errors import UnknownMeasurement, NoMeasurementRunning
 from measurement import Measurement
+from errors import UnknownMeasurement, NoMeasurementRunning
 
 
 class MeasurementStore(object):
@@ -8,8 +8,6 @@ class MeasurementStore(object):
     Manages a series of measurements.
 
     """
-    default_group = "default"
-
     def __init__(self):
         self.reset()
 
@@ -18,72 +16,77 @@ class MeasurementStore(object):
         Reset the internal data.
 
         """
-        self._last = None
-        self._measurements = {}
-        self._created = time()
+        self.running_measurement = None
+        self.store = {}
+        self.created = time()
 
-    def _key(self, name, group=default_group):
+    def _key(self, name, group=""):
         """
         Returns the key with which a measurement is stored in the measurements dict.
 
         """
         return group + "::" + name
 
-    def _exists(self, name, group=default_group):
+    def _put(self, measurement):
+        """
+        Store the `measurement` object in the measurements dict.
+
+        """
+        key = self._key(measurement.name, measurement.group)
+        self.store[key] = measurement
+
+    def all(self):
+        """
+        Return an iterator over all measurements.
+
+        """
+        return self.store.itervalues()
+
+    def exists(self, name, group=""):
         """
         Returns True if a measurement with `name` of `group` exists.
 
         """
         key = self._key(name, group)
-        return key in self._measurements
+        return key in self.store
 
-    def get(self, name, group=default_group):
+    def get(self, name, group=""):
         """
         Returns the measurement with `name` in `group` or raise an exception.
 
         """
         key = self._key(name, group)
         try:
-            return self._measurements[key]
+            return self.store[key]
         except KeyError:
             print "Known measurements (in format group::name):\n\t{}.".format(
-                self._measurements.keys())
+                self.store.keys())
             raise UnknownMeasurement("Can't find measurement '{}' of "
-                                          "group '{}'.".format(name, group))
+                                     "group '{}'.".format(name, group))
 
-    def _put(self, measurement):
-        """
-        Save the `measurement` object in the measurements dict.
-
-        """
-        key = self._key(measurement.name, measurement.group)
-        self._measurements[key] = measurement
-
-    def start(self, name, group=default_group):
+    def start(self, name, group=""):
         """
         Start a measurement with `name` and `group`.
 
-        If it is a new measurement, it will be created. If it isn't, the
-        existing measurement will continue.
+        Will create a new measurement if it doesn't exist already.
 
         """
-        if self._exists(name, group):
+        try:
             measurement = self.get(name, group)
-            measurement.start()
-        else:
+        except UnknownMeasurement:
             measurement = Measurement(name, group)
-            measurement.start()
             self._put(measurement)
-        self._last = measurement
+        measurement.start()
+        self.running_measurement = measurement
 
-    def stop(self, name, group=default_group):
+    def stop(self, name, group=""):
         """
         Stop the measurement `name` of `group`.
 
         """
         measurement = self.get(name, group)
         measurement.stop()
-        self._last = None
+        self.running_measurement = None
 
     def stop_last(self):
         """
@@ -94,16 +97,17 @@ class MeasurementStore(object):
         hand using `start`.
 
         """
-        if self._last is None:
+        if self.running_measurement is None:
             raise NoMeasurementRunning("There is no measurement to stop.")
-        self._last.stop()
+        self.running_measurement.stop()
+        self.running_measurement = None
 
-    def start_next(self, name, group=default_group):
+    def start_next(self, name, group=""):
         """
         Stops the last measurement to start a new one with `name` and `group`.
 
         """
-        if self._last is None:
+        if self.running_measurement is None:
             raise NoMeasurementRunning("There is no measurement to stop.")
         self.stop_last()
         self.start(name, group)

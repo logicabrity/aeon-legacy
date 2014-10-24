@@ -1,8 +1,81 @@
 import pytest
 import time
 from aeon.timer import Timer
+from aeon.measurement_store import MeasurementStore
 
 EPSILON = 1e-16
+
+
+def test_context():
+    timer = Timer()
+
+    for i in xrange(4):
+        with timer('context', 'test_helpers'):
+            pass
+    assert timer.calls('context', 'test_helpers') == 4
+
+
+def test_context_without_group_should_use_default_group():
+    timer = Timer()
+
+    for i in xrange(4):
+        with timer('context_alt'):
+            pass
+    assert timer.calls('context_alt', Timer.default_group) == 4
+
+
+def test_context_is_exception_safe():
+    class ExampleError(Exception):
+        pass
+
+    timer = Timer()
+    with pytest.raises(ExampleError):
+        with timer("exception_test"):
+            raise ExampleError("Example")
+
+    with timer("exception_test"):
+        print "We can do this because the last measurement was stopped gracefully."
+
+
+def test_decorated_function():
+    timer = Timer()
+
+    @timer.ftimed
+    def my_func():
+        pass
+
+    my_func()
+    assert timer.calls('my_func', 'test_timer') == 1
+
+
+def test_decorated_method():
+    timer = Timer()
+
+    class Foo(object):
+        @timer.mtimed
+        def bar(self):
+            pass
+
+    foo = Foo()
+    for i in xrange(3):
+        foo.bar()
+    assert timer.calls('bar', 'Foo') == 3
+
+
+def test_return_values_of_functions_and_methods_should_not_be_affected():
+    timer = Timer()
+
+    @timer.ftimed
+    def returns_one():
+        return 1
+    assert returns_one() == 1
+
+    class MyClass(object):
+        @timer.mtimed
+        def returns_two(self):
+            return 2
+    mo = MyClass()
+    assert mo.returns_two() == 2
 
 
 def test_total_runtime_sums_individual_runtimes():
