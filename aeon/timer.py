@@ -1,10 +1,10 @@
 from time import time
 from operator import attrgetter
 from collections import defaultdict
-from series import Series
+from measurement_store import MeasurementStore
 
 
-class Timer(Series):
+class Timer(MeasurementStore):
     """
     Extends Series to support queries and print nice measurement results.
 
@@ -23,7 +23,7 @@ class Timer(Series):
         """
         return time() - self._created
 
-    def calls(self, name, group=Series.default_group):
+    def calls(self, name, group=MeasurementStore.default_group):
         """
         Returns the number of calls to the object of `group` with `name`.
 
@@ -31,7 +31,7 @@ class Timer(Series):
         measurement = self.get(name, group)
         return measurement.calls
 
-    def time(self, name, group=Series.default_group):
+    def time(self, name, group=MeasurementStore.default_group):
         """
         Returns the total runtime of the measurement of `group` with `name`.
 
@@ -39,7 +39,7 @@ class Timer(Series):
         measurement = self.get(name, group)
         return measurement.total_runtime
 
-    def time_per_call(self, name, group=Series.default_group):
+    def time_per_call(self, name, group=MeasurementStore.default_group):
         """
         Returns the average runtime for one execution of the measurement
         of `group` with `name`.

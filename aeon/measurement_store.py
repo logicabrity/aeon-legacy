@@ -13,13 +13,9 @@ class NoMeasurementRunningError(AeonError):
     pass
 
 
-class Series(object):
+class MeasurementStore(object):
     """
     Manages a series of measurements.
-
-    They are stored by the measurements' group and name, which most
-    often is module/function or class/method. However, these could also
-    be user-defined.
 
     """
     default_group = "default"
@@ -32,11 +28,11 @@ class Series(object):
         Reset the internal data.
 
         """
-        self.__last = None
+        self._last = None
         self._measurements = {}
         self._created = time()
 
-    def __key(self, name, group=default_group):
+    def _key(self, name, group=default_group):
         """
         Returns the key with which a measurement is stored in the measurements dict.
 
@@ -48,7 +44,7 @@ class Series(object):
         Returns True if a measurement with `name` of `group` exists.
 
         """
-        key = self.__key(name, group)
+        key = self._key(name, group)
         return key in self._measurements
 
     def get(self, name, group=default_group):
@@ -56,7 +52,7 @@ class Series(object):
         Returns the measurement with `name` in `group` or raise an exception.
 
         """
-        key = self.__key(name, group)
+        key = self._key(name, group)
         try:
             return self._measurements[key]
         except KeyError:
@@ -70,7 +66,7 @@ class Series(object):
         Save the `measurement` object in the measurements dict.
 
         """
-        key = self.__key(measurement.name, measurement.group)
+        key = self._key(measurement.name, measurement.group)
         self._measurements[key] = measurement
 
     def start(self, name, group=default_group):
@@ -88,7 +84,7 @@ class Series(object):
             measurement = Measurement(name, group)
             measurement.start()
             self._put(measurement)
-        self.__last = measurement
+        self._last = measurement
 
     def stop(self, name, group=default_group):
         """
@@ -97,7 +93,7 @@ class Series(object):
         """
         measurement = self.get(name, group)
         measurement.stop()
-        self.__last = None
+        self._last = None
 
     def stop_last(self):
         """
@@ -108,16 +104,16 @@ class Series(object):
         hand using `start`.
 
         """
-        if self.__last is None:
+        if self._last is None:
             raise NoMeasurementRunningError("There is no measurement to stop.")
-        self.__last.stop()
+        self._last.stop()
 
     def start_next(self, name, group=default_group):
         """
         Stops the last measurement to start a new one with `name` and `group`.
 
         """
-        if self.__last is None:
+        if self._last is None:
             raise NoMeasurementRunningError("There is no measurement to stop.")
         self.stop_last()
         self.start(name, group)
