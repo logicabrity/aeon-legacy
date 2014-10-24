@@ -14,7 +14,7 @@ Outline
 2. Tell your program to output the report or provide you the data when
    it's done.
 3. Run your program.
-4. \?\?\?
+4. ?????
 5. Profit.
 
 Basic Usage
@@ -26,22 +26,22 @@ A free-standing piece of code.
 
 .. code:: python
 
-    from aeon import timed
+    from aeon import timer
 
-    with timed('my measurement'):
+    with timer('my measurement'):
         # do stuff here...
 
     # to assign the measurement to a specific group
-    with timed('my measurement', 'general frobnication'):
+    with timer('my measurement', 'general frobnication'):
         # do stuff here
 
 A function.
 
 .. code:: python
 
-    from aeon import ftimed
+    from aeon import timer
 
-    @ftimed
+    @timer
     def my_function():
         pass
 
@@ -49,10 +49,10 @@ A method.
 
 .. code:: python
 
-    from aeon import mtimed
+    from aeon import timer
 
     class Foo(object):
-        @mtimed
+        @timer.method
         def bar(self):
             pass
 
@@ -60,44 +60,43 @@ How to see the report.
 
 .. code:: python
 
-    from aeon import default_timer
+    from aeon import timer
 
-    print default_timer.report() 
-    print default_timer  # equivalent
+    print timer.report() 
+    print timer  # equivalent
 
 Further features
 ----------------
 
-The ``timed``, ``ftimed`` and ``mtimed`` helpers all take an optional
-``timer`` parameter in case you want to use your own timer or several
-timer objects in parallel.
+You can instantiate your own timer if you want to, in case you want to
+use several in parallel.
 
 .. code:: python
 
-    from aeon import timed, ftimed, mtimed, Timer
+    from aeon import Timer
 
-    my_custom_timer = Timer()
+    my_timer= Timer()
 
-    with timed('my_measurement', timer=my_custom_timer):
+    with my_timer('my_measurement'):
         pass
 
     # or
-    with timed('my_measurement', 'my_group', my_custom_timer):
+    with my_timer('my_measurement', 'my_group'):
         pass
 
-    @ftimed(my_custom_timer)
+    @my_timer
     def foo():
         pass
 
     class Foo(object):
-        @mtimed(my_custom_timer)
+        @my_timer.method
         def bar(self):
             pass
 
 The timer object can be queried for specific measurements or the data
 with which it generates the report.
 
-Also, nothing prevents from using the Measurement class on its own:
+Also, nothing prevents you from using the Measurement class on its own:
 
 .. code:: python
 
