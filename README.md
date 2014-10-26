@@ -109,6 +109,13 @@ assert m.calls == 100
 print m.total_runtime, m.time_per_call
 ```
 
+Installation
+------------
+
+Installation is easy as:
+
+    sudo pip install aeon
+
 Rationale
 ---------
 

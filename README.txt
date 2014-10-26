@@ -24,7 +24,7 @@ How to designate code that should be monitored.
 
 A free-standing piece of code.
 
-.. code:: python
+::
 
     from aeon import timer
 
@@ -37,7 +37,7 @@ A free-standing piece of code.
 
 A function.
 
-.. code:: python
+::
 
     from aeon import timer
 
@@ -47,7 +47,7 @@ A function.
 
 A method.
 
-.. code:: python
+::
 
     from aeon import timer
 
@@ -58,7 +58,7 @@ A method.
 
 How to see the report.
 
-.. code:: python
+::
 
     from aeon import timer
 
@@ -71,7 +71,7 @@ Further features
 You can instantiate your own timer if you want to, in case you want to
 use several in parallel.
 
-.. code:: python
+::
 
     from aeon import Timer
 
@@ -98,7 +98,7 @@ with which it generates the report.
 
 Also, nothing prevents you from using the Measurement class on its own:
 
-.. code:: python
+::
 
     from aeon import Measurement
 
@@ -110,6 +110,15 @@ Also, nothing prevents you from using the Measurement class on its own:
 
     assert m.calls == 100
     print m.total_runtime, m.time_per_call
+
+Installation
+------------
+
+Installation is easy as:
+
+::
+
+    sudo pip install aeon
 
 Rationale
 ---------
