@@ -118,7 +118,7 @@ Installation is easy as:
 
 ::
 
-    sudo pip install aeon
+    $ sudo pip install aeon
 
 Rationale
 ---------
