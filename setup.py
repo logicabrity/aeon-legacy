@@ -1,11 +1,13 @@
 from distutils.core import setup
 
+exec(open('aeon/version.py').read())  # provides __version__ below
+
 setup(
     name='Aeon',
     url='https://github.com/sMAshdot/aeon',
     author='Marc-Antonio Bisotti',
     author_email='mail@marc-antonio.de',
-    version='2.0.0',
+    version=__version__,
     packages=['aeon', ],
     keywords=['profiling', 'timings', 'benchmark'],
     license='The MIT License (MIT)',
