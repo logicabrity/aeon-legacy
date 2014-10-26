@@ -14,7 +14,7 @@ Outline
 2. Tell your program to output the report or provide you the data when
    it's done.
 3. Run your program.
-4. ?????
+4. \?\?\?\?\?
 5. Profit.
 
 Basic Usage
@@ -116,7 +116,7 @@ Installation
 
 Installation is easy as:
 
-.. code::
+.. code:: bash
 
     $ sudo pip install aeon
 
