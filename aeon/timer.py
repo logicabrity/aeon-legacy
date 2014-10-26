@@ -1,10 +1,10 @@
-from time import time
-from operator import attrgetter
 from collections import defaultdict
-from measurement_store import MeasurementStore
 from functools import update_wrapper
-from sys import modules
+from operator import attrgetter
 from os import path
+from sys import modules
+from time import time
+from .measurement_store import MeasurementStore
 
 
 class Timer(object):

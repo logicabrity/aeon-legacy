@@ -1,5 +1,5 @@
 from time import time
-from errors import InvalidMeasurementState
+from .errors import InvalidMeasurementState
 
 
 class Measurement(object):

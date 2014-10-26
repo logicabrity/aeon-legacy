@@ -1,6 +1,6 @@
 from time import time
-from measurement import Measurement
-from errors import UnknownMeasurement, NoMeasurementRunning
+from .errors import UnknownMeasurement, NoMeasurementRunning
+from .measurement import Measurement
 
 
 class MeasurementStore(object):
