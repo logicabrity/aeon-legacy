@@ -4,7 +4,7 @@ exec(open('aeon/version.py').read())  # provides __version__ below
 
 setup(
     name='Aeon',
-    url='https://github.com/sMAshdot/aeon',
+    url='https://github.com/logicabrity/aeon',
     author='Marc-Antonio Bisotti',
     author_email='mail@marc-antonio.de',
     version=__version__,
