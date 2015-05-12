@@ -71,9 +71,9 @@ class MeasurementStore(object):
         Will create a new measurement if it doesn't exist already.
 
         """
-        try:
+        if self.exists(name, group):
             measurement = self.get(name, group)
-        except UnknownMeasurement:
+        else:
             measurement = Measurement(name, group)
             self._put(measurement)
         measurement.start()
