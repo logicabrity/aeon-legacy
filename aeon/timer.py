@@ -106,7 +106,7 @@ class Timer(object):
         with a sequence of measurements.
 
         """
-        self.measurements.start_next()
+        self.measurements.start_next(name, group)
 
     def total_runtime(self):
         """
