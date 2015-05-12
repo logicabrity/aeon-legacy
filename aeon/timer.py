@@ -12,7 +12,7 @@ class Timer(object):
 
     def __init__(self):
         self.measurements = MeasurementStore()
-        self._context = None
+        self._context = []
 
     def __call__(self, func_or_name, group=default_group):
         if callable(func_or_name):
@@ -29,19 +29,18 @@ class Timer(object):
             return decorated_func
         else:
             name = func_or_name
-            self._context = (name, group)
+            self._context.append((name, group))
             return self
 
     def __enter__(self):
-        if self._context is None:
+        if not self._context:
             raise ArgumentError("Please use aeon's contextmanager with",
                                 "the measurement name (and optionally group) as ",
                                 "argument.")
-        self.measurements.start(*self._context)
+        self.measurements.start(*self._context[-1])
 
     def __exit__(self, type, value, traceback):
-        self.measurements.stop(*self._context)
-        self._context = None
+        self.measurements.stop(*self._context.pop())
 
     def method(self, met):
         """

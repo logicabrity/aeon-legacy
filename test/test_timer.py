@@ -86,6 +86,24 @@ def test_decorated_method():
     assert timer.calls('baz', 'Foo') == 1
 
 
+def test_nested_methods():
+    timer = Timer()
+
+    class Foo(object):
+        @timer.method
+        def __init__(self):
+            self.nested()
+            self.nested()
+
+        @timer.method
+        def nested(self):
+            pass
+
+    f = Foo()
+    assert timer.calls('__init__', 'Foo') == 1
+    assert timer.calls('nested', 'Foo') == 2
+
+
 def test_return_values_of_functions_and_methods_should_not_be_affected():
     timer = Timer()
 
