@@ -1,3 +1,4 @@
+import warnings
 from collections import defaultdict
 from functools import update_wrapper
 from operator import attrgetter
@@ -30,6 +31,8 @@ class Timer(object):
         else:
             name = func_or_name
             self._context.append((name, group))
+            if len(self._context) > 1:
+                warnings.warn("You are nesting measurements in {}::{}.".format(name, group))
             return self
 
     def __enter__(self):
