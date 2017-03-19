@@ -9,7 +9,7 @@ EPSILON = 1e-16
 def test_context():
     timer = Timer()
 
-    for i in xrange(4):
+    for i in range(4):
         with timer('context', 'test_helpers'):
             pass
     assert timer.calls('context', 'test_helpers') == 4
@@ -18,7 +18,7 @@ def test_context():
 def test_context_without_group_should_use_default_group():
     timer = Timer()
 
-    for i in xrange(4):
+    for i in range(4):
         with timer('context_alt'):
             pass
     assert timer.calls('context_alt', Timer.default_group) == 4
@@ -34,7 +34,7 @@ def test_context_is_exception_safe():
             raise ExampleError("Example")
 
     with timer("exception_test"):
-        print "We can do this because the last measurement was stopped gracefully."
+        print("We can do this because the last measurement was stopped gracefully.")
 
 
 def test_decorated_function():
@@ -142,7 +142,7 @@ def test_total_walltime_measures_time_passing():
 @pytest.mark.fixed
 def test_timer_per_call():
     t = Timer()
-    for i in xrange(10):
+    for i in range(10):
         t.start("foo")
         t.stop("foo")
     assert abs(t.time_per_call("foo") - t.time("foo")/t.calls("foo")) < EPSILON
@@ -150,12 +150,12 @@ def test_timer_per_call():
 
 def test_can_return_a_report():
     t = Timer()
-    print t.report()
+    print(t.report())
 
     t.start("foo")
     t.stop("foo")
     t.start("bar")
     t.stop("bar")
-    print t.report()
-    print t.report(1)
-    print t
+    print(t.report())
+    print(t.report(1))
+    print(t)

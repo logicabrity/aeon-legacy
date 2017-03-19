@@ -199,7 +199,7 @@ class Timer(object):
 
         recorded_time = self.total_runtime()
         wall_time = self.total_walltime()
-        grouped_timings = [(group, tot_t, 100 * tot_t / wall_time) for group, tot_t in grouped_timings.iteritems()]
+        grouped_timings = [(group, tot_t, 100 * tot_t / wall_time) for group, tot_t in grouped_timings.items()]
 
         diff = abs(recorded_time - wall_time)
         rel_diff = 100 * (1 - recorded_time / wall_time)
