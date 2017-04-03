@@ -40,7 +40,7 @@ class MeasurementStore(object):
         Return an iterator over all measurements.
 
         """
-        return self.store.itervalues()
+        return iter(self.store.values())
 
     def exists(self, name, group=""):
         """
@@ -59,8 +59,8 @@ class MeasurementStore(object):
         try:
             return self.store[key]
         except KeyError:
-            print "Known measurements (in format group::name):\n\t{}.".format(
-                self.store.keys())
+            print("Known measurements (in format group::name):\n\t{}.".format(
+                list(self.store.keys())))
             raise UnknownMeasurement("Can't find measurement '{}' of "
                                      "group '{}'.".format(name, group))
 
